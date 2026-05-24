@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  password     String
+  firstName    String
+  lastName     String
+  phone        String
+  role         String            @default("USER")
+  address      String?
+  city         String?
+  state        String?
+  zip          String?
+  partnerCode  String?
+  createdAt    DateTime          @default(now())
+  llcOrders    LlcRegistration[]
+  transactions Transaction[]
+  balances     VirtualBalance[]
+}
+
+model LlcRegistration {
+  id                     String   @id @default(uuid())
+  userId                 String
+  companyName            String
+  designator             String
+  state                  String
+  industry               String
+  registeredAgent        Boolean  @default(false)
+  mailForwarding         Boolean  @default(false)
+  einApplication         Boolean  @default(false)
+  cryptoProtectionActive Boolean  @default(false)
+  walletShippingAddress  String?
+  roiTrackingStatus      String   @default("PENDING_ACTIVATION")
+  legalDocsSent          Boolean  @default(false)
+  status                 String   @default("PENDING_PAYMENT")
+  createdAt              DateTime @default(now())
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model WalletAsset {
+  id        String           @id @default(uuid())
+  symbol    String           @unique
+  name      String
+  network   String
+  iconColor String
+  iconUrl   String
+  price     Float            @default(0.0)
+  change    Float            @default(0.0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  balances  VirtualBalance[]
+}
+
+model VirtualBalance {
+  id        String      @id @default(uuid())
+  userId    String
+  assetId   String
+  amount    Float       @default(0.0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  asset     WalletAsset @relation(fields: [assetId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+
+  @@unique([userId, assetId])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  assetSymbol String
+  amount      Float
+  status      String   @default("COMPLETED")
+  txHash      String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
