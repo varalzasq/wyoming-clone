@@ -24,6 +24,8 @@ model User {
   llcOrders    LlcRegistration[]
   transactions Transaction[]
   balances     VirtualBalance[]
+
+  @@map("app_User")
 }
 
 model LlcRegistration {
@@ -43,6 +45,8 @@ model LlcRegistration {
   status                 String   @default("PENDING_PAYMENT")
   createdAt              DateTime @default(now())
   user                   User     @relation(fields: [userId], references: [id])
+
+  @@map("app_LlcRegistration")
 }
 
 model ContactMessage {
@@ -52,6 +56,8 @@ model ContactMessage {
   subject   String
   message   String
   createdAt DateTime @default(now())
+
+  @@map("app_ContactMessage")
 }
 
 model WalletAsset {
@@ -66,6 +72,8 @@ model WalletAsset {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   balances  VirtualBalance[]
+
+  @@map("app_WalletAsset")
 }
 
 model VirtualBalance {
@@ -79,6 +87,7 @@ model VirtualBalance {
   user      User        @relation(fields: [userId], references: [id])
 
   @@unique([userId, assetId])
+  @@map("app_VirtualBalance")
 }
 
 model Transaction {
@@ -91,4 +100,6 @@ model Transaction {
   txHash      String?
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
+
+  @@map("app_Transaction")
 }

@@ -22,8 +22,10 @@ function signToken(payload, secret) {
 }
 const mockAdminLogin = async (req, res) => {
     const secret = process.env.ADMIN_JWT_SECRET;
+    console.log("SECRET PRESENT?", !!secret);
+    console.log("ADMINS PRESENT?", !!process.env.ADMIN_1_USER);
     if (!secret) {
-        res.status(500).json({ success: false });
+        res.status(500).json({ success: false, error: "no secret" });
         return;
     }
     const { username, password } = req.body || {};
