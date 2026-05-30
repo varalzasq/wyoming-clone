@@ -24,18 +24,24 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 // Middleware
 app.use((0, helmet_1.default)({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'];
+let allowedOrigins = [
+    'https://icapitalwyomingllc.com',
+    'https://www.icapitalwyomingllc.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001'
+];
+if (process.env.ALLOWED_ORIGINS) {
+    allowedOrigins = allowedOrigins.concat(process.env.ALLOWED_ORIGINS.split(','));
+}
+if (process.env.CORS_ORIGIN) {
+    allowedOrigins = allowedOrigins.concat(process.env.CORS_ORIGIN.split(','));
+}
+// Clean up any accidental spaces from env variables
+allowedOrigins = allowedOrigins.map(origin => origin.trim());
 app.use((0, cors_1.default)({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-            callback(null, true);
-        }
-        else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
