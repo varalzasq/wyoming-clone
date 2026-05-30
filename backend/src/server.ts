@@ -23,9 +23,24 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'];
+let allowedOrigins = [
+  'https://icapitalwyomingllc.com',
+  'https://www.icapitalwyomingllc.com',
+  'http://localhost:3000', 
+  'http://127.0.0.1:3000', 
+  'http://localhost:3001', 
+  'http://127.0.0.1:3001'
+];
+
+if (process.env.ALLOWED_ORIGINS) {
+  allowedOrigins = allowedOrigins.concat(process.env.ALLOWED_ORIGINS.split(','));
+}
+if (process.env.CORS_ORIGIN) {
+  allowedOrigins = allowedOrigins.concat(process.env.CORS_ORIGIN.split(','));
+}
+
+// Clean up any accidental spaces from env variables
+allowedOrigins = allowedOrigins.map(origin => origin.trim());
 
 app.use(cors({
   origin: function (origin, callback) {
